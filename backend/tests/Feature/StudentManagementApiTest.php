@@ -132,7 +132,8 @@ class StudentManagementApiTest extends TestCase
         $dashboardResponse->assertOk()
             ->assertJsonPath('summary.total_active_students', 1)
             ->assertJsonPath('summary.male_count', 1)
-            ->assertJsonPath('summary.female_count', 0);
+            ->assertJsonPath('summary.female_count', 0)
+            ->assertJsonPath('summary.total_origins', 1);
         $this->assertStringNotContainsString('Jl. Merdeka No. 10', $dashboardResponse->getContent());
 
         // Nonaktifkan mahasiswa (BR-03, BR-14)

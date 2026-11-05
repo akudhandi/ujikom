@@ -255,9 +255,9 @@ export function FacultyDistributionChart({
                 </linearGradient>
               </defs>
 
-              <line stroke="#eceef2" strokeDasharray="4 4" x1="34" x2="526" y1="36" y2="36" />
-              <line stroke="#eceef2" strokeDasharray="4 4" x1="34" x2="526" y1="79" y2="79" />
-              <line stroke="#e5e7eb" x1="34" x2="526" y1="122" y2="122" />
+              <line stroke="var(--line)" strokeDasharray="4 4" x1="34" x2="526" y1="36" y2="36" />
+              <line stroke="var(--line)" strokeDasharray="4 4" x1="34" x2="526" y1="79" y2="79" />
+              <line stroke="var(--line-strong)" x1="34" x2="526" y1="122" y2="122" />
 
               {svgPath.area ? <path d={svgPath.area} fill="url(#emeraldAreaGrad)" /> : null}
               {svgPath.line ? (
@@ -284,13 +284,13 @@ export function FacultyDistributionChart({
                   <circle
                     cx={pt.x}
                     cy={pt.y}
-                    fill="#ffffff"
+                    fill="var(--surface)"
                     r="5"
                     stroke="#16a34a"
                     strokeWidth="2.5"
                   />
                   <text
-                    fill="#111315"
+                    fill="var(--ink)"
                     fontFamily="var(--font-mono)"
                     fontSize="10"
                     fontWeight="600"
@@ -301,7 +301,7 @@ export function FacultyDistributionChart({
                     {pt.count}
                   </text>
                   <text
-                    fill="#6b7280"
+                    fill="var(--muted)"
                     fontFamily="var(--font-mono)"
                     fontSize={curvePoints.length > 7 ? "8.5" : "9.5"}
                     textAnchor="middle"

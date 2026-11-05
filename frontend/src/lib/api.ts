@@ -103,7 +103,13 @@ export async function getDashboardHealth(): Promise<{ message: string }> {
 }
 
 export async function fetchDashboardData(): Promise<DashboardData> {
-  return apiRequest<DashboardData>("/api/dashboard");
+  return apiRequest<DashboardData>(`/api/dashboard?_t=${Date.now()}`, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
+  });
 }
 
 export async function fetchFaculties(): Promise<FacultyItem[]> {

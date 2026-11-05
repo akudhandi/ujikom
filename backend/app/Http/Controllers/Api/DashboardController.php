@@ -142,12 +142,16 @@ class DashboardController extends Controller
                 'total_faculties' => $faculties->count(),
                 'active_faculties_count' => $activeFacultiesCount,
                 'total_study_programs' => StudyProgram::query()->count(),
+                'total_origins' => $originCounts->count(),
                 'generated_at' => $nowJakarta->toIso8601String(),
             ],
             'gender_distribution' => $genderDistribution,
             'origin_distribution' => $originDistribution,
             'faculty_distribution' => $facultyDistribution,
             'age_distribution' => $ageDistribution,
+        ])->withHeaders([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
         ]);
     }
 }

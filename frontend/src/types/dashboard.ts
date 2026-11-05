@@ -35,6 +35,7 @@ export type DashboardSummary = {
   total_faculties: number;
   active_faculties_count: number;
   total_study_programs: number;
+  total_origins?: number;
   generated_at: string;
 };
 

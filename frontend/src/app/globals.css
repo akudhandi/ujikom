@@ -36,6 +36,8 @@
   --warning: #d97706;
   --warning-soft: #fef3c7;
 
+  --chart-secondary: #111315;
+
   --font-display: var(--font-display-loaded), "Outfit", "Inter", system-ui, -apple-system, sans-serif;
   --font-text: var(--font-text-loaded), "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: var(--font-mono-loaded), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -54,6 +56,44 @@
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dur: 180ms;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --canvas: #0b0e14;
+  --sidebar-bg: #0f131b;
+  --workspace-bg: #121722;
+  --surface: #171d2b;
+  --surface-muted: #1e2638;
+  --surface-hover: #263046;
+
+  --ink: #f3f4f6;
+  --ink-secondary: #cbd5e1;
+  --muted: #94a3b8;
+
+  --line: #263044;
+  --line-strong: #334155;
+
+  --primary: #16a34a;
+  --primary-ink: #ffffff;
+  --primary-hover: #22c55e;
+
+  --accent: #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.16);
+  --accent-ink: #4ade80;
+
+  --danger: #f87171;
+  --danger-soft: rgba(239, 68, 68, 0.16);
+  --warning: #fbbf24;
+  --warning-soft: rgba(245, 158, 11, 0.16);
+
+  --chart-secondary: #38bdf8;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 6px 24px -4px rgba(0, 0, 0, 0.45);
+  --shadow-float: 0 14px 36px -8px rgba(0, 0, 0, 0.6);
 }
 
 *,
@@ -1175,7 +1215,7 @@ button {
 .bar-row__track {
   height: 8px;
   border-radius: 999px;
-  background: #edf0f4;
+  background: var(--surface-hover);
   overflow: hidden;
 }
 
@@ -1209,20 +1249,47 @@ button {
 }
 
 .badge--inactive {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--surface-hover);
+  color: var(--ink-secondary);
 }
 
 .badge--live {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .badge--degree {
-  background: #eef2ff;
-  color: #3730a3;
+  background: rgba(99, 102, 241, 0.14);
+  color: #6366f1;
   font-family: var(--font-mono);
   font-size: 11px;
+}
+
+[data-theme="dark"] .badge--degree {
+  background: rgba(129, 140, 248, 0.18);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .data-table tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+[data-theme="dark"] .curve-callout {
+  background: var(--surface-hover);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+
+[data-theme="dark"] .ruler-strip__tick {
+  background: var(--line-strong);
+}
+
+[data-theme="dark"] .ruler-strip__fill {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.35) 0%, rgba(245, 158, 11, 0.35) 48%, rgba(34, 197, 94, 0.45) 100%);
+}
+
+[data-theme="dark"] .alert--error {
+  color: #fca5a5;
 }
 
 /* ---------------------------------------------------------------- Filter Tabs & Toolbar */

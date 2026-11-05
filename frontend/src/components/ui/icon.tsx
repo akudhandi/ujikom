@@ -31,7 +31,9 @@ export type IconName =
   | "ban"
   | "panel-left"
   | "bell"
-  | "sliders";
+  | "sliders"
+  | "sun"
+  | "moon";
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, "name"> & {
   name: IconName;
@@ -191,6 +193,13 @@ const paths: Record<IconName, ReactNode> = {
       <line x1="18" x2="22" y1="16" y2="16" />
     </>
   ),
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2m-17.07 7.07 1.41-1.41m11.32-11.32 1.41-1.41" />
+    </>
+  ),
+  moon: <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />,
 };
 
 export function Icon({ name, className, ...props }: IconProps) {

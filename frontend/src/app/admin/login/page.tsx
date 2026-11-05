@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 
 import { Icon } from "@/components/ui/icon";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ApiError, fetchCurrentAdmin, loginAdmin } from "@/lib/api";
 
 export default function LoginPage() {
@@ -113,14 +114,26 @@ export default function LoginPage() {
 
         <section className="login-card__body">
           <div>
-            <Link
-              className="btn btn--secondary btn--sm"
-              href="/"
-              style={{ display: "inline-flex", marginBottom: "16px" }}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                marginBottom: "16px",
+              }}
             >
-              <Icon name="chevron-left" />
-              Kembali ke Dashboard Publik
-            </Link>
+              <Link
+                className="btn btn--secondary btn--sm"
+                href="/"
+                prefetch={false}
+                style={{ display: "inline-flex" }}
+              >
+                <Icon name="chevron-left" />
+                Kembali ke Dashboard Publik
+              </Link>
+              <ThemeToggle />
+            </div>
             <h2
               style={{
                 fontFamily: "var(--font-display)",

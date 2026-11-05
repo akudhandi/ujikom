@@ -21,8 +21,8 @@ type DashboardShellProps = {
   initialFacultyCode?: string;
 };
 
-const AGE_COLORS = ["#16a34a", "#111315", "#0284c7", "#f59e0b"];
-const ORIGIN_COLORS = ["#16a34a", "#111315", "#0284c7", "#f59e0b", "#7c3aed", "#64748b"];
+const AGE_COLORS = ["#16a34a", "var(--chart-secondary)", "#0284c7", "#f59e0b"];
+const ORIGIN_COLORS = ["#16a34a", "var(--chart-secondary)", "#0284c7", "#f59e0b", "#7c3aed", "#64748b"];
 
 export function DashboardShell({
   initialData,
@@ -39,23 +39,37 @@ export function DashboardShell({
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
-    if (initialData) {
-      return;
-    }
     let mounted = true;
-    fetchDashboardData()
-      .then((res) => {
-        if (mounted) {
-          setData(res);
-        }
-      })
-      .catch(() => {
-        // Pertahankan state kosong jika belum ada data
-      });
+
+    const loadLatestDashboard = () => {
+      fetchDashboardData()
+        .then((res) => {
+          if (mounted) {
+            setData(res);
+          }
+        })
+        .catch(() => {
+          // Pertahankan state terakhir jika jaringan gagal
+        });
+    };
+
+    loadLatestDashboard();
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible") {
+        loadLatestDashboard();
+      }
+    };
+
+    window.addEventListener("focus", handleVisibilityOrFocus);
+    document.addEventListener("visibilitychange", handleVisibilityOrFocus);
+
     return () => {
       mounted = false;
+      window.removeEventListener("focus", handleVisibilityOrFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityOrFocus);
     };
-  }, [initialData]);
+  }, [section]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -92,7 +106,7 @@ export function DashboardShell({
         label: "Laki-laki",
         count: summary.male_count,
         percentage: summary.male_percentage,
-        color: "#111315",
+        color: "var(--chart-secondary)",
       },
       {
         key: "female",
@@ -366,7 +380,7 @@ export function DashboardShell({
                 <div className="mini-stat">
                   <span className="mini-stat__label">Sebaran Asal Daerah</span>
                   <div className="mini-stat__value">
-                    <CountUp to={origins.length} />
+                    <CountUp to={summary.total_origins ?? origins.length} />
                     <small> wilayah</small>
                   </div>
                   <div className="mini-stat__foot">
@@ -626,7 +640,7 @@ export function DashboardShell({
             >
               <span className="mini-stat__label">Wilayah Asal Tercatat</span>
               <div className="mini-stat__value">
-                <CountUp to={origins.length} />
+                <CountUp to={summary.total_origins ?? origins.length} />
                 <small> daerah</small>
               </div>
               <div className="mini-stat__foot">

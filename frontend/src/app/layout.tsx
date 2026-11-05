@@ -30,12 +30,27 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const themeInitScript = `
+    (function() {
+      try {
+        var saved = localStorage.getItem('ucn_theme');
+        var theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+      } catch (e) {}
+    })();
+  `;
+
   return (
     <html
       className={`${outfit.variable} ${inter.variable} ${jetbrainsMono.variable}`}
       data-radius="soft"
       lang="id"
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

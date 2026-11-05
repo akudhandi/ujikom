@@ -73,7 +73,7 @@ export function PieChart({
             cy={center}
             fill="none"
             r={radius}
-            stroke="#eef0f4"
+            stroke="var(--surface-hover)"
             strokeWidth={strokeWidth}
           />
           <g transform={`rotate(-90 ${center} ${center})`}>

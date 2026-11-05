@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 
 import { Icon } from "@/components/ui/icon";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { fetchCurrentAdmin, getStoredUser, logoutAdmin } from "@/lib/api";
 import type { AuthUser } from "@/types/dashboard";
 
@@ -113,24 +114,28 @@ export function PublicShell({
             <Link
               className={`public-navbar__link${activeNav === "ikhtisar" ? " is-active" : ""}`}
               href="/"
+              prefetch={false}
             >
               Ikhtisar
             </Link>
             <Link
               className={`public-navbar__link${activeNav === "demografi" ? " is-active" : ""}`}
               href="/demografi"
+              prefetch={false}
             >
               Demografi &amp; Usia
             </Link>
             <Link
               className={`public-navbar__link${activeNav === "wilayah" ? " is-active" : ""}`}
               href="/wilayah"
+              prefetch={false}
             >
               Sebaran Wilayah
             </Link>
             <Link
               className={`public-navbar__link${activeNav === "fakultas" ? " is-active" : ""}`}
               href="/fakultas"
+              prefetch={false}
             >
               Fakultas &amp; Prodi
             </Link>
@@ -141,7 +146,7 @@ export function PublicShell({
               className="topbar__search"
               onSubmit={handleSearchSubmit}
               role="search"
-              style={{ width: "260px" }}
+              style={{ width: "240px" }}
             >
               <Icon name="search" />
               <input
@@ -160,6 +165,8 @@ export function PublicShell({
                 value={controlledQuery}
               />
             </form>
+
+            <ThemeToggle />
 
             {adminUser ? (
               <Link className="btn btn--primary btn--sm" href="/admin/students">
@@ -314,6 +321,7 @@ export function AppShell({
               className="sidebar__item"
               href="/"
               onClick={() => setSidebarOpen(false)}
+              prefetch={false}
             >
               <span className="sidebar__item-left">
                 <Icon name="chart-column" />
@@ -385,10 +393,12 @@ export function AppShell({
 
             <div className="topbar__right">
               <div className="topbar__cluster">
+                <ThemeToggle />
                 <Link
                   aria-label="Lihat Dashboard Publik"
                   className="topbar__icon-btn"
                   href="/"
+                  prefetch={false}
                   title="Dashboard Publik"
                 >
                   <Icon name="house" />
