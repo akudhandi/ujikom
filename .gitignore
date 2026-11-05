@@ -27,3 +27,7 @@ out/
 build/
 dist/
 *.tsbuildinfo
+
+# Local scratch
+build.log
+exitcode.txt
