@@ -10,6 +10,16 @@ import type { AuthUser } from "@/types/dashboard";
 
 type NavKey = "dashboard" | "demografi" | "fakultas" | "students" | "create";
 
+type PublicShellProps = {
+  title: string;
+  subtitle?: string;
+  headerAction?: ReactNode;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+  children: ReactNode;
+};
+
 type AppShellProps = {
   current?: NavKey;
   title: string;
@@ -20,12 +30,132 @@ type AppShellProps = {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
-  apiConnected?: boolean;
   children: ReactNode;
 };
 
+/**
+ * Layout Khusus Pengunjung / Guest (Top Navbar tanpa Sidebar Admin)
+ */
+export function PublicShell({
+  title,
+  subtitle,
+  headerAction,
+  searchValue = "",
+  onSearchChange,
+  searchPlaceholder = "Cari fakultas atau program studi...",
+  children,
+}: PublicShellProps) {
+  const pathname = usePathname();
+  const [adminUser, setAdminUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const cached = getStoredUser();
+    if (cached) {
+      Promise.resolve().then(() => {
+        if (active) {
+          setAdminUser(cached);
+        }
+      });
+    }
+    fetchCurrentAdmin().then((user) => {
+      if (active) {
+        setAdminUser(user);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const target = document.getElementById("katalog-fakultas");
+    target?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <div className="public-frame">
+      <div className="public-container">
+        <header className="public-navbar">
+          <Link className="sidebar__logo" href="/">
+            <span aria-hidden="true" className="sidebar__mark">
+              <Icon className="icon" name="graduation-cap" />
+            </span>
+            <span className="sidebar__title">
+              <b>UCN Hub</b>
+              <span>Universitas Cakrawala Nusantara</span>
+            </span>
+          </Link>
+
+          <nav aria-label="Navigasi Statistik Publik" className="public-navbar__links">
+            <a className="public-navbar__link is-active" href="#ikhtisar-utama">
+              Ikhtisar
+            </a>
+            <a className="public-navbar__link" href="#analitik-demografi">
+              Demografi &amp; Usia
+            </a>
+            <a className="public-navbar__link" href="#sebaran-wilayah">
+              Sebaran Wilayah
+            </a>
+            <a className="public-navbar__link" href="#katalog-fakultas">
+              Fakultas &amp; Prodi
+            </a>
+          </nav>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <form
+              className="topbar__search"
+              onSubmit={handleSearchSubmit}
+              role="search"
+              style={{ width: "260px" }}
+            >
+              <Icon name="search" />
+              <input
+                aria-label={searchPlaceholder}
+                onChange={(e) => onSearchChange?.(e.target.value)}
+                placeholder={searchPlaceholder}
+                style={{ height: "38px" }}
+                type="search"
+                value={searchValue}
+              />
+            </form>
+
+            {adminUser ? (
+              <Link className="btn btn--primary btn--sm" href="/admin/students">
+                <Icon name="layout-dashboard" />
+                Workspace Admin
+              </Link>
+            ) : (
+              <Link className="btn btn--secondary btn--sm" href="/admin/login">
+                <Icon name="lock" />
+                Portal Admin
+              </Link>
+            )}
+          </div>
+        </header>
+
+        <main className="public-workspace">
+          <div className="hero-bar" id="ikhtisar-utama">
+            <div className="hero-bar__title">
+              <h1>{title}</h1>
+              {subtitle ? <p>{subtitle}</p> : null}
+            </div>
+            {headerAction ? <div className="btn-row">{headerAction}</div> : null}
+          </div>
+
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Layout Khusus Workspace Administrasi (Sidebar SkillHub)
+ */
 export function AppShell({
-  current = "dashboard",
+  current = "students",
   title,
   subtitle,
   headerAction,
@@ -34,7 +164,6 @@ export function AppShell({
   searchValue,
   onSearchChange,
   searchPlaceholder = "Cari nama mahasiswa, NPM, asal daerah, atau prodi...",
-  apiConnected = true,
   children,
 }: AppShellProps) {
   const router = useRouter();
@@ -66,17 +195,12 @@ export function AppShell({
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const query = (onSearchChange ? searchValue ?? "" : internalSearch).trim();
+    const query = (onSearchChange ? (searchValue ?? "") : internalSearch).trim();
     if (onSearchChange) {
       onSearchChange(query);
       return;
     }
-    if (adminUser) {
-      router.push(query ? `/admin/students?search=${encodeURIComponent(query)}` : "/admin/students");
-    } else {
-      const target = document.getElementById("katalog-fakultas");
-      target?.scrollIntoView({ behavior: "smooth" });
-    }
+    router.push(query ? `/admin/students?search=${encodeURIComponent(query)}` : "/admin/students");
   };
 
   const handleLogout = async () => {
@@ -103,60 +227,25 @@ export function AppShell({
         />
       ) : null}
 
-      <aside aria-label="Navigasi samping" className={`sidebar${sidebarOpen ? " is-open" : ""}`}>
+      <aside aria-label="Navigasi Workspace Admin" className={`sidebar${sidebarOpen ? " is-open" : ""}`}>
         <div className="sidebar__top">
           <div className="sidebar__brand">
-            <Link className="sidebar__logo" href="/">
+            <Link className="sidebar__logo" href="/admin/students">
               <span aria-hidden="true" className="sidebar__mark">
                 <Icon className="icon" name="graduation-cap" />
               </span>
               <span className="sidebar__title">
-                <b>UCN Hub</b>
-                <span>Data Mahasiswa</span>
+                <b>UCN Admin</b>
+                <span>Portal Kemahasiswaan</span>
               </span>
             </Link>
-            <span aria-hidden="true" className="sidebar__collapse-badge" title="Workspace Navigasi">
+            <span aria-hidden="true" className="sidebar__collapse-badge" title="Menu Administrasi">
               <Icon className="icon" name="panel-left" />
             </span>
           </div>
 
-          <nav aria-label="Menu Utama" className="sidebar__group">
-            <span className="sidebar__group-label">Menu Utama</span>
-            <Link
-              className={`sidebar__item${current === "dashboard" ? " is-active" : ""}`}
-              href="/"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <span className="sidebar__item-left">
-                <Icon name="layout-dashboard" />
-                <span>Dashboard</span>
-              </span>
-            </Link>
-            <Link
-              className={`sidebar__item${current === "demografi" ? " is-active" : ""}`}
-              href="/#analitik-demografi"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <span className="sidebar__item-left">
-                <Icon name="chart-column" />
-                <span>Analitik Demografi</span>
-              </span>
-            </Link>
-            <Link
-              className={`sidebar__item${current === "fakultas" ? " is-active" : ""}`}
-              href="/#katalog-fakultas"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <span className="sidebar__item-left">
-                <Icon name="building" />
-                <span>Fakultas &amp; Prodi</span>
-              </span>
-              <span className="sidebar__badge">40</span>
-            </Link>
-          </nav>
-
-          <nav aria-label="Administrasi" className="sidebar__group">
-            <span className="sidebar__group-label">Administrasi</span>
+          <nav aria-label="Manajemen Mahasiswa" className="sidebar__group">
+            <span className="sidebar__group-label">Manajemen Data</span>
             <Link
               className={`sidebar__item${current === "students" ? " is-active" : ""}`}
               href="/admin/students"
@@ -177,40 +266,42 @@ export function AppShell({
                 <span>Tambah Mahasiswa</span>
               </span>
             </Link>
+          </nav>
 
-            {adminUser ? (
-              <button
-                className="sidebar__item"
-                disabled={loggingOut}
-                onClick={handleLogout}
-                type="button"
-              >
-                <span className="sidebar__item-left">
-                  <Icon name="log-out" />
-                  <span>{loggingOut ? "Keluar..." : "Keluar Admin"}</span>
-                </span>
-              </button>
-            ) : (
-              <Link
-                className="sidebar__item"
-                href="/admin/login"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <span className="sidebar__item-left">
-                  <Icon name="lock" />
-                  <span>Masuk Admin</span>
-                </span>
-              </Link>
-            )}
+          <nav aria-label="Pintasan & Akun" className="sidebar__group">
+            <span className="sidebar__group-label">Pintasan</span>
+            <Link
+              className="sidebar__item"
+              href="/"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className="sidebar__item-left">
+                <Icon name="chart-column" />
+                <span>Dashboard Publik</span>
+              </span>
+              <Icon className="icon" name="arrow-up-right" />
+            </Link>
+
+            <button
+              className="sidebar__item"
+              disabled={loggingOut}
+              onClick={handleLogout}
+              type="button"
+            >
+              <span className="sidebar__item-left">
+                <Icon name="log-out" />
+                <span>{loggingOut ? "Keluar..." : "Keluar Sesi"}</span>
+              </span>
+            </button>
           </nav>
         </div>
 
         <div className="sidebar__bottom">
           <div className="sidebar__status">
-            <span className={`status-dot${apiConnected ? "" : " status-dot--warn"}`} />
+            <span className="status-dot" />
             <div>
               <div style={{ fontWeight: 600, color: "var(--ink)", fontSize: "12.5px" }}>
-                {apiConnected ? "API Laravel Terhubung" : "Menunggu API Laravel"}
+                Universitas Cakrawala Nusantara
               </div>
               <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>
                 9 Fakultas · 40 Program Studi
@@ -255,12 +346,12 @@ export function AppShell({
             <div className="topbar__right">
               <div className="topbar__cluster">
                 <Link
-                  aria-label="Ringkasan Dashboard"
+                  aria-label="Lihat Dashboard Publik"
                   className="topbar__icon-btn"
                   href="/"
-                  title="Dashboard"
+                  title="Dashboard Publik"
                 >
-                  <Icon name="bell" />
+                  <Icon name="house" />
                 </Link>
                 {adminUser ? (
                   <div className="topbar__user">
@@ -277,15 +368,7 @@ export function AppShell({
                         .toUpperCase()}
                     </span>
                   </div>
-                ) : (
-                  <Link className="topbar__user" href="/admin/login">
-                    <div className="topbar__user-info">
-                      <b>Mode Publik</b>
-                      <span>Klik untuk login admin</span>
-                    </div>
-                    <span className="avatar">UCN</span>
-                  </Link>
-                )}
+                ) : null}
               </div>
             </div>
           </header>

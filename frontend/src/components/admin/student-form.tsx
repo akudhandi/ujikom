@@ -247,7 +247,6 @@ export function StudentForm({ mode, studentId }: StudentFormProps) {
               dipilih.
             </p>
           </div>
-          <span className="badge badge--degree">Relasi Tervalidasi</span>
         </div>
 
         <div className="field-grid">
@@ -297,14 +296,10 @@ export function StudentForm({ mode, studentId }: StudentFormProps) {
           <div>
             <h2 className="bento-card__title">3. Asal Daerah &amp; Alamat Sesuai KTP</h2>
             <p className="bento-card__sub">
-              Asal daerah digunakan untuk agregat publik; alamat lengkap KTP bersifat privat dan
-              hanya tampil di halaman admin.
+              Asal daerah digunakan untuk statistik demografi; alamat lengkap KTP hanya tampil pada
+              halaman administrasi.
             </p>
           </div>
-          <span className="chip-select">
-            <Icon className="icon" name="lock" />
-            KTP Privat Admin
-          </span>
         </div>
 
         <div className="field-grid">

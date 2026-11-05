@@ -235,8 +235,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <SpotlightCard className="col-5">
             <div className="bento-card__head">
               <div>
-                <h2 className="bento-card__title">Pengaturan Status Data</h2>
-                <p className="bento-card__sub">Kebijakan Soft Deactivation (Tanpa Hard Delete)</p>
+                <h2 className="bento-card__title">Pengaturan Status Mahasiswa</h2>
+                <p className="bento-card__sub">Pengelolaan status keaktifan akademik</p>
               </div>
               <Icon className="icon" name="sliders" />
             </div>

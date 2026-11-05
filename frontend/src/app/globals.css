@@ -136,6 +136,198 @@ button {
   border: 0;
 }
 
+/* ---------------------------------------------------------------- Public Guest Frame (Top Navbar) */
+.public-frame {
+  min-height: 100vh;
+  background: var(--canvas);
+  padding: 16px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 639px) {
+  .public-frame {
+    padding: 10px 10px 24px;
+  }
+}
+
+.public-container {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.public-navbar {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 10px 16px 10px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+}
+
+.public-navbar__links {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.public-navbar__link {
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.public-navbar__link:hover {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.public-navbar__link.is-active {
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.public-workspace {
+  background: var(--workspace-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: 28px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-shadow: var(--shadow-xs);
+}
+
+@media (max-width: 767px) {
+  .public-workspace {
+    padding: 18px 16px 28px;
+    border-radius: 20px;
+  }
+}
+
+/* ---------------------------------------------------------------- Pie / Donut Chart Widget */
+.pie-widget {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  padding: 6px 0;
+}
+
+@media (max-width: 639px) {
+  .pie-widget {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.pie-widget__chart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.pie-widget__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 24px;
+}
+
+.pie-widget__center-val {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.pie-widget__center-lbl {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-top: 3px;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pie-legend {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.pie-legend__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: var(--surface-muted);
+  border: 1px solid transparent;
+  font-size: 13px;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.pie-legend__item.is-active,
+.pie-legend__item:hover {
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+
+.pie-legend__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.pie-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.pie-legend__name {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pie-legend__val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
 /* ---------------------------------------------------------------- App Shell (SkillHub Layout) */
 .app-frame {
   min-height: 100vh;

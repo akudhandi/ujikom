@@ -1,24 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { AppShell } from "@/components/layout/site-header";
+import { PublicShell } from "@/components/layout/site-header";
 import { CountUp } from "@/components/ui/count-up";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Icon } from "@/components/ui/icon";
+import { PieChart, type PieChartSlice } from "@/components/ui/pie-chart";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { fetchDashboardData } from "@/lib/api";
 import type { DashboardData } from "@/types/dashboard";
 
 type DashboardShellProps = {
   initialData: DashboardData | null;
-  apiReady: boolean;
+  apiReady?: boolean;
 };
 
-export function DashboardShell({ initialData, apiReady: initialApiReady }: DashboardShellProps) {
+const AGE_COLORS = ["#16a34a", "#111315", "#0284c7", "#f59e0b"];
+
+export function DashboardShell({ initialData }: DashboardShellProps) {
   const [data, setData] = useState<DashboardData | null>(initialData);
-  const [apiReady, setApiReady] = useState<boolean>(initialApiReady);
   const [selectedFacultyCode, setSelectedFacultyCode] = useState<string>("ALL");
   const [selectedDegree, setSelectedDegree] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -33,13 +34,10 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
       .then((res) => {
         if (mounted) {
           setData(res);
-          setApiReady(true);
         }
       })
       .catch(() => {
-        if (mounted) {
-          setApiReady(false);
-        }
+        // Tetap tampilkan state kosong jika belum ada data
       });
     return () => {
       mounted = false;
@@ -51,7 +49,6 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
     try {
       const fresh = await fetchDashboardData();
       setData(fresh);
-      setApiReady(true);
     } catch {
       // Pertahankan data terakhir jika gagal
     } finally {
@@ -74,6 +71,38 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
   const faculties = useMemo(() => data?.faculty_distribution ?? [], [data]);
   const origins = useMemo(() => data?.origin_distribution ?? [], [data]);
   const ages = useMemo(() => data?.age_distribution ?? [], [data]);
+
+  const genderSlices: PieChartSlice[] = useMemo(
+    () => [
+      {
+        key: "male",
+        label: "Laki-laki",
+        count: summary.male_count,
+        percentage: summary.male_percentage,
+        color: "#111315",
+      },
+      {
+        key: "female",
+        label: "Perempuan",
+        count: summary.female_count,
+        percentage: summary.female_percentage,
+        color: "#16a34a",
+      },
+    ],
+    [summary.male_count, summary.female_count, summary.male_percentage, summary.female_percentage],
+  );
+
+  const ageSlices: PieChartSlice[] = useMemo(
+    () =>
+      ages.map((bucket, idx) => ({
+        key: bucket.range,
+        label: bucket.range,
+        count: bucket.count,
+        percentage: bucket.percentage,
+        color: AGE_COLORS[idx % AGE_COLORS.length],
+      })),
+    [ages],
+  );
 
   const topFaculty = useMemo(() => {
     if (faculties.length === 0) {
@@ -127,9 +156,11 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
       .filter((faculty) => faculty.study_programs.length > 0);
   }, [faculties, selectedDegree, searchQuery]);
 
-  // Buat titik kurva SVG halus untuk distribusi 9 fakultas
   const curvePoints = useMemo(() => {
-    const items = faculties.length > 0 ? faculties : Array.from({ length: 9 }, (_, i) => ({ count: 0, code: `F${i + 1}` }));
+    const items =
+      faculties.length > 0
+        ? faculties
+        : Array.from({ length: 9 }, (_, i) => ({ count: 0, code: `F${i + 1}` }));
     const maxCount = Math.max(...items.map((f) => f.count ?? 0), 1);
     const width = 520;
     const height = 140;
@@ -168,37 +199,36 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
     return { line: d, area };
   }, [curvePoints]);
 
-  const maleWidthPercent = summary.total_active_students > 0
-    ? Math.max(18, Math.min(82, Math.round(summary.male_percentage)))
-    : 50;
+  const maleWidthPercent =
+    summary.total_active_students > 0
+      ? Math.max(18, Math.min(82, Math.round(summary.male_percentage)))
+      : 50;
 
   return (
-    <AppShell
-      apiConnected={apiReady}
-      current="dashboard"
+    <PublicShell
       headerAction={
         <>
           <button
             className="btn btn--secondary"
             disabled={refreshing}
             onClick={handleRefresh}
-            title="Muat ulang agregat real-time"
+            title="Perbarui data statistik"
             type="button"
           >
             <Icon name="rotate-ccw" />
-            {refreshing ? "Memuat..." : "Segarkan Data"}
+            {refreshing ? "Memperbarui..." : "Perbarui Statistik"}
           </button>
-          <Link className="btn btn--primary" href="/admin/students">
-            <span>Kelola Mahasiswa</span>
+          <a className="btn btn--primary" href="#katalog-fakultas">
+            <span>Jelajahi 40 Program Studi</span>
             <Icon name="arrow-up-right" />
-          </Link>
+          </a>
         </>
       }
       onSearchChange={setSearchQuery}
-      searchPlaceholder="Cari fakultas atau program studi di dashboard..."
+      searchPlaceholder="Cari fakultas atau program studi..."
       searchValue={searchQuery}
-      subtitle="Statistik agregat mahasiswa aktif Universitas Cakrawala Nusantara — diperbarui secara real-time."
-      title="Halo, Selamat Datang di UCN Hub"
+      subtitle="Ringkasan statistik dan demografi mahasiswa aktif Universitas Cakrawala Nusantara."
+      title="Dashboard Statistik Kemahasiswaan"
     >
       {/* BARIS 1: Ikhtisar Mahasiswa Aktif (SkillHub Growth Overview) + Analitik Akademik (3 Mini Cards) */}
       <section aria-label="Ringkasan utama mahasiswa" className="bento-grid">
@@ -226,24 +256,20 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
               <span className="growth-split__val">
                 <CountUp decimals={1} suffix="%" to={summary.male_percentage} />
               </span>
-              <span className="growth-split__capt">
-                Laki-laki ({summary.male_count} mhs)
-              </span>
+              <span className="growth-split__capt">Laki-laki ({summary.male_count} mhs)</span>
             </div>
             <div className="growth-split__item growth-split__item--right">
               <span className="growth-split__val">
                 <CountUp decimals={1} suffix="%" to={summary.female_percentage} />
               </span>
-              <span className="growth-split__capt">
-                Perempuan ({summary.female_count} mhs)
-              </span>
+              <span className="growth-split__capt">Perempuan ({summary.female_count} mhs)</span>
             </div>
           </div>
 
           <div
             aria-label={`Proporsi Laki-laki ${summary.male_percentage}% dan Perempuan ${summary.female_percentage}%`}
             className="ruler-strip"
-             style={{
+            style={{
               gridTemplateColumns: `${maleWidthPercent}% 1fr`,
             }}
           >
@@ -280,7 +306,7 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
                   <Icon className="icon" name="trending-up" />
                   100%
                 </span>
-                <span>unit akademik terdaftar</span>
+                <span>unit akademik aktif</span>
               </div>
             </div>
 
@@ -317,11 +343,72 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
         </SpotlightCard>
       </section>
 
-      {/* BARIS 2: Kurva & Breakdown Fakultas/Prodi + Demografi Kelompok Usia & Gender */}
+      {/* BARIS 2: Pie/Donut Chart Komposisi Jenis Kelamin + Pie/Donut Chart Distribusi Kelompok Usia */}
       <section
-        aria-label="Visualisasi demografi dan akademik"
+        aria-label="Grafik lingkaran jenis kelamin dan kelompok usia"
         className="bento-grid"
         id="analitik-demografi"
+      >
+        <SpotlightCard className="col-6">
+          <div className="bento-card__head">
+            <div>
+              <h2 className="bento-card__title">Komposisi Jenis Kelamin</h2>
+              <p className="bento-card__sub">
+                Perbandingan proporsi mahasiswa aktif laki-laki dan perempuan
+              </p>
+            </div>
+            <span className="badge badge--active">Pie Chart</span>
+          </div>
+
+          {summary.total_active_students === 0 ? (
+            <EmptyState
+              description="Grafik jenis kelamin akan muncul saat data mahasiswa aktif tersedia."
+              icon="users"
+              title="Belum ada data jenis kelamin"
+            />
+          ) : (
+            <PieChart
+              ariaLabel="Diagram lingkaran komposisi jenis kelamin mahasiswa aktif"
+              centerLabel="Mahasiswa Aktif"
+              centerValue={summary.total_active_students}
+              slices={genderSlices}
+            />
+          )}
+        </SpotlightCard>
+
+        <SpotlightCard className="col-6">
+          <div className="bento-card__head">
+            <div>
+              <h2 className="bento-card__title">Distribusi Kelompok Usia</h2>
+              <p className="bento-card__sub">
+                Proporsi rentang usia mahasiswa aktif berdasarkan tanggal lahir
+              </p>
+            </div>
+            <span className="badge badge--active">Pie Chart</span>
+          </div>
+
+          {summary.total_active_students === 0 ? (
+            <EmptyState
+              description="Distribusi kelompok usia muncul ketika terdapat mahasiswa aktif."
+              icon="calendar"
+              title="Belum ada data usia"
+            />
+          ) : (
+            <PieChart
+              ariaLabel="Diagram lingkaran distribusi kelompok usia mahasiswa aktif"
+              centerLabel="Rentang Usia"
+              centerValue={`${ages.filter((a) => a.count > 0).length} grup`}
+              slices={ageSlices}
+            />
+          )}
+        </SpotlightCard>
+      </section>
+
+      {/* BARIS 3: Kurva & Breakdown Fakultas/Prodi + Sebaran Asal Daerah (Top 10) */}
+      <section
+        aria-label="Visualisasi fakultas dan asal daerah"
+        className="bento-grid"
+        id="sebaran-wilayah"
       >
         <SpotlightCard className="col-7">
           <div className="bento-card__head">
@@ -353,7 +440,7 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
 
           {summary.total_active_students === 0 ? (
             <EmptyState
-              description="Tambahkan mahasiswa aktif melalui halaman admin untuk melihat grafik fakultas dan program studi."
+              description="Grafik fakultas dan program studi akan muncul saat terdapat mahasiswa aktif."
               icon="building"
               title="Belum ada mahasiswa aktif"
             />
@@ -378,7 +465,7 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
                     </span>
                   ) : null}
                   <span className="muted" style={{ fontSize: "12px" }}>
-                    Klik filter di kanan atas untuk rincian prodi per fakultas
+                    Pilih fakultas di kanan atas untuk melihat rincian per program studi
                   </span>
                 </div>
 
@@ -462,98 +549,57 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
           )}
         </SpotlightCard>
 
-        <div className="col-5" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <SpotlightCard>
-            <div className="bento-card__head">
-              <div>
-                <h2 className="bento-card__title">Kelompok Usia &amp; Gender</h2>
-                <p className="bento-card__sub">Dihitung otomatis dari tanggal lahir (Asia/Jakarta)</p>
-              </div>
-              <span className="badge badge--active">Aktif</span>
+        <SpotlightCard className="col-5">
+          <div className="bento-card__head">
+            <div>
+              <h2 className="bento-card__title">Sebaran Asal Daerah (Top 10)</h2>
+              <p className="bento-card__sub">Kota/kabupaten &amp; provinsi asal mahasiswa aktif</p>
             </div>
+            <span className="chip-select">
+              <Icon className="icon" name="map-pin" />
+              {origins.length} daerah
+            </span>
+          </div>
 
-            {summary.total_active_students === 0 ? (
-              <EmptyState
-                description="Distribusi kelompok usia muncul ketika terdapat mahasiswa aktif."
-                icon="calendar"
-                title="Belum ada data usia"
-              />
-            ) : (
-              <div className="bar-list">
-                {ages.map((bucket) => (
-                  <div className="bar-row" key={bucket.range}>
-                    <div className="bar-row__meta">
-                      <span className="bar-row__name">{bucket.range}</span>
-                      <span className="bar-row__val">
-                        {bucket.count} mhs ({bucket.percentage}%)
-                      </span>
-                    </div>
-                    <div className="bar-row__track">
-                      <div
-                        className="bar-row__fill bar-row__fill--dark"
-                        style={{
-                          width: `${Math.max(bucket.count > 0 ? 6 : 0, bucket.percentage)}%`,
-                        }}
-                      />
-                    </div>
+          {origins.length === 0 ? (
+            <EmptyState
+              description="Grafik asal daerah akan terisi otomatis saat data mahasiswa aktif tersedia."
+              icon="map-pin"
+              title="Belum ada data asal daerah"
+            />
+          ) : (
+            <div className="bar-list">
+              {origins.map((origin) => (
+                <div className="bar-row" key={origin.region}>
+                  <div className="bar-row__meta">
+                    <span className="bar-row__name">{origin.region}</span>
+                    <span className="bar-row__val">
+                      {origin.count} mhs ({origin.percentage}%)
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </SpotlightCard>
-
-          <SpotlightCard style={{ flex: 1 }}>
-            <div className="bento-card__head">
-              <div>
-                <h2 className="bento-card__title">Sebaran Asal Daerah (Top 10)</h2>
-                <p className="bento-card__sub">Kota/kabupaten &amp; provinsi asal mahasiswa aktif</p>
-              </div>
-              <span className="chip-select">
-                <Icon className="icon" name="map-pin" />
-                {origins.length} daerah
-              </span>
+                  <div className="bar-row__track">
+                    <div
+                      className="bar-row__fill"
+                      style={{
+                        width: `${Math.max(origin.count > 0 ? 6 : 0, origin.percentage)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {origins.length === 0 ? (
-              <EmptyState
-                description="Grafik asal daerah akan terisi otomatis saat data mahasiswa aktif tersedia."
-                icon="map-pin"
-                title="Belum ada data asal daerah"
-              />
-            ) : (
-              <div className="bar-list">
-                {origins.map((origin) => (
-                  <div className="bar-row" key={origin.region}>
-                    <div className="bar-row__meta">
-                      <span className="bar-row__name">{origin.region}</span>
-                      <span className="bar-row__val">
-                        {origin.count} mhs ({origin.percentage}%)
-                      </span>
-                    </div>
-                    <div className="bar-row__track">
-                      <div
-                        className="bar-row__fill"
-                        style={{
-                          width: `${Math.max(origin.count > 0 ? 6 : 0, origin.percentage)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </SpotlightCard>
-        </div>
+          )}
+        </SpotlightCard>
       </section>
 
-      {/* BARIS 3: Katalog Lengkap 9 Fakultas & 40 Program Studi */}
+      {/* BARIS 4: Katalog Lengkap 9 Fakultas & 40 Program Studi */}
       <SpotlightCard id="katalog-fakultas">
         <div className="filter-bar">
           <div>
             <h2 className="bento-card__title">Katalog 9 Fakultas &amp; 40 Program Studi</h2>
             <p className="bento-card__sub">
-              Master referensi resmi Fakultas, Program Sarjana (S1), Sarjana Terapan (D4), Profesi,
-              Magister (S2), dan Doktor (S3)
+              Daftar Fakultas, Program Sarjana (S1), Sarjana Terapan (D4), Profesi, Magister (S2),
+              dan Doktor (S3)
             </p>
           </div>
 
@@ -604,6 +650,6 @@ export function DashboardShell({ initialData, apiReady: initialApiReady }: Dashb
           ))}
         </div>
       </SpotlightCard>
-    </AppShell>
+    </PublicShell>
   );
 }

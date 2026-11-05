@@ -44,7 +44,7 @@ export default function LoginPage() {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("Gagal terhubung ke server autentikasi Laravel.");
+        setErrorMessage("Tidak dapat terhubung ke layanan autentikasi. Silakan coba kembali.");
       }
     } finally {
       setSubmitting(false);
@@ -69,15 +69,15 @@ export default function LoginPage() {
                 <span style={{ color: "#9ca3af" }}>Universitas Cakrawala Nusantara</span>
               </span>
             </Link>
-            <span className="badge badge--active">Sanctum Auth</span>
+            <span className="badge badge--active">Portal Akademik</span>
           </div>
 
           <div style={{ display: "grid", gap: "14px" }}>
             <h1>Portal Administrasi Data Mahasiswa</h1>
             <p style={{ color: "#d1d5db", fontSize: "14.5px", lineHeight: 1.6 }}>
               Kelola pencatatan mahasiswa baru, pembaruan data akademik lintas 9 fakultas &amp; 40
-              program studi, serta penonaktifan data (soft deactivation) yang terhubung langsung ke
-              analitik dashboard.
+              program studi, serta pengelolaan status aktif mahasiswa yang terintegrasi dengan
+              statistik universitas.
             </p>
           </div>
 
@@ -104,9 +104,9 @@ export default function LoginPage() {
             </div>
             <div>
               <div style={{ fontFamily: "var(--font-display)", fontSize: "22px", fontWeight: 600 }}>
-                Real-Time
+                Terpadu
               </div>
-              <div style={{ fontSize: "12px", color: "#9ca3af" }}>Sinkronisasi API</div>
+              <div style={{ fontSize: "12px", color: "#9ca3af" }}>Data Kemahasiswaan</div>
             </div>
           </div>
         </section>
@@ -119,7 +119,7 @@ export default function LoginPage() {
               style={{ display: "inline-flex", marginBottom: "16px" }}
             >
               <Icon name="chevron-left" />
-              Kembali ke Dashboard
+              Kembali ke Dashboard Publik
             </Link>
             <h2
               style={{
@@ -132,7 +132,7 @@ export default function LoginPage() {
               Masuk sebagai Admin
             </h2>
             <p className="muted" style={{ fontSize: "13.5px", marginTop: "4px" }}>
-              Gunakan kredensial administrator untuk mengakses modul CRUD mahasiswa.
+              Gunakan akun administrator untuk mengelola data mahasiswa.
             </p>
           </div>
 
@@ -178,13 +178,13 @@ export default function LoginPage() {
 
             <button className="btn btn--primary btn--block" disabled={submitting} type="submit">
               <Icon name="lock" />
-              {submitting ? "Memverifikasi Kredensial..." : "Masuk ke Workspace Admin"}
+              {submitting ? "Memverifikasi Akun..." : "Masuk ke Workspace Admin"}
             </button>
           </form>
 
           <div className="cred-box">
             <div>
-              <div style={{ fontWeight: 600, color: "var(--ink)" }}>Akun Seeder Lokal</div>
+              <div style={{ fontWeight: 600, color: "var(--ink)" }}>Akses Cepat Penguji</div>
               <div className="mono muted" style={{ fontSize: "12px" }}>
                 user: admin · pass: admin123
               </div>

@@ -163,7 +163,7 @@ export default function StudentsPage() {
               <Icon className="icon" name="circle-check" />
               Dihitung
             </span>
-            <span>dalam agregat dashboard publik</span>
+            <span>dalam statistik dashboard publik</span>
           </div>
         </div>
 
@@ -174,12 +174,12 @@ export default function StudentsPage() {
             <small> arsip</small>
           </div>
           <div className="mini-stat__foot">
-            <span>Tersimpan aman (soft deactivation)</span>
+            <span>Arsip riwayat akademik tersimpan</span>
           </div>
         </div>
 
         <div className="mini-stat" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
-          <span className="mini-stat__label">Total Rekaman Database</span>
+          <span className="mini-stat__label">Total Data Mahasiswa</span>
           <div className="mini-stat__value">
             <CountUp to={meta.counts.all} />
             <small> total</small>
@@ -274,7 +274,7 @@ export default function StudentsPage() {
 
         {loading ? (
           <div className="empty">
-            <p className="muted">Memuat daftar mahasiswa dari API Laravel...</p>
+            <p className="muted">Memuat daftar mahasiswa...</p>
           </div>
         ) : students.length === 0 ? (
           <EmptyState
