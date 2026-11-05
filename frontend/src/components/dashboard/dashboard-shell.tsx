@@ -346,13 +346,6 @@ export function DashboardShell({
                     <CountUp to={summary.active_faculties_count} />
                     <small>/{summary.total_faculties}</small>
                   </div>
-                  <div className="mini-stat__foot">
-                    <span className="trend-up">
-                      <Icon className="icon" name="trending-up" />
-                      100%
-                    </span>
-                    <span>unit akademik aktif</span>
-                  </div>
                 </div>
 
                 <div className="mini-stat">

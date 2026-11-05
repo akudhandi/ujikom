@@ -86,7 +86,7 @@ class StudentManagementApiTest extends TestCase
 
         $createResponse = $this->actingAs($admin, 'sanctum')->postJson('/api/admin/students', [
             'name' => 'Budi Santoso',
-            'npm' => '2410119001',
+            'npm' => '24101190001',
             'ktp_address' => 'Jl. Merdeka No. 10, Kota Surabaya',
             'origin_region' => 'Kota Surabaya, Jawa Timur',
             'faculty_id' => $fasilkom->id,
@@ -97,14 +97,14 @@ class StudentManagementApiTest extends TestCase
 
         $createResponse->assertCreated()
             ->assertJsonPath('data.status', 'active')
-            ->assertJsonPath('data.npm', '2410119001');
+            ->assertJsonPath('data.npm', '24101190001');
 
         $studentId = (int) $createResponse->json('data.id');
 
         // Program studi dari fakultas berbeda harus ditolak (BR-09)
         $this->actingAs($admin, 'sanctum')->postJson('/api/admin/students', [
             'name' => 'Salah Prodi',
-            'npm' => '2410119002',
+            'npm' => '24101190002',
             'ktp_address' => 'Jl. Merdeka No. 11, Kota Surabaya',
             'origin_region' => 'Kota Surabaya, Jawa Timur',
             'faculty_id' => $fasilkom->id,
@@ -113,6 +113,19 @@ class StudentManagementApiTest extends TestCase
             'gender' => 'female',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['study_program_id']);
+
+        // NPM harus hanya angka dengan panjang tepat 11 digit
+        $this->actingAs($admin, 'sanctum')->postJson('/api/admin/students', [
+            'name' => 'NPM Salah Panjang',
+            'npm' => '2410119001',
+            'ktp_address' => 'Jl. Merdeka No. 12, Kota Surabaya',
+            'origin_region' => 'Kota Surabaya, Jawa Timur',
+            'faculty_id' => $fasilkom->id,
+            'study_program_id' => $informatika->id,
+            'date_of_birth' => '2005-04-12',
+            'gender' => 'male',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['npm']);
 
         // Dashboard publik hanya menghitung mahasiswa aktif dan tidak membocorkan alamat KTP (BR-05, BR-12)
         $dashboardResponse = $this->getJson('/api/dashboard');
@@ -141,7 +154,7 @@ class StudentManagementApiTest extends TestCase
         // NPM mahasiswa nonaktif tetap tidak boleh dipakai mahasiswa baru (BR-08)
         $this->actingAs($admin, 'sanctum')->postJson('/api/admin/students', [
             'name' => 'Duplikat NPM',
-            'npm' => '2410119001',
+            'npm' => '24101190001',
             'ktp_address' => 'Jl. Pahlawan No. 99, Kota Bandung',
             'origin_region' => 'Kota Bandung, Jawa Barat',
             'faculty_id' => $fasilkom->id,

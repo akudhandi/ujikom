@@ -21,7 +21,7 @@ class StudentFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'npm' => fake()->unique()->numerify('24########'),
+            'npm' => fake()->unique()->numerify('24#########'),
             'ktp_address' => 'Jl. '.fake()->streetName().' No. '.fake()->buildingNumber().', RT 02/RW 04',
             'origin_region' => fake()->randomElement([
                 'Kota Bandung, Jawa Barat',

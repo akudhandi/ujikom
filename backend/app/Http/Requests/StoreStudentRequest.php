@@ -45,7 +45,7 @@ class StoreStudentRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'min:2', 'max:150'],
-            'npm' => ['required', 'string', 'min:5', 'max:30', Rule::unique('students', 'npm')],
+            'npm' => ['required', 'string', 'digits:11', 'regex:/^\d{11}$/', Rule::unique('students', 'npm')],
             'ktp_address' => ['required', 'string', 'min:5', 'max:500'],
             'origin_region' => ['required', 'string', 'min:2', 'max:150'],
             'faculty_id' => ['required', 'integer', Rule::exists('faculties', 'id')],
@@ -72,7 +72,8 @@ class StoreStudentRequest extends FormRequest
             'name.required' => 'Nama mahasiswa wajib diisi.',
             'name.min' => 'Nama mahasiswa minimal 2 karakter.',
             'npm.required' => 'NPM wajib diisi.',
-            'npm.min' => 'NPM minimal 5 karakter.',
+            'npm.digits' => 'NPM wajib berupa angka dengan panjang tepat 11 digit.',
+            'npm.regex' => 'NPM hanya boleh berisi angka (11 digit).',
             'npm.unique' => 'NPM sudah terdaftar pada data mahasiswa (aktif atau nonaktif).',
             'ktp_address.required' => 'Alamat sesuai KTP wajib diisi.',
             'ktp_address.min' => 'Alamat sesuai KTP minimal 5 karakter.',

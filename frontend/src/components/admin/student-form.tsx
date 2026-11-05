@@ -115,6 +115,11 @@ export function StudentForm({ mode, studentId }: StudentFormProps) {
     setErrorMessage(null);
     setFieldErrors({});
 
+    if (!/^\d{11}$/.test(npm.trim())) {
+      setFieldErrors({ npm: ["NPM wajib berupa angka dengan panjang tepat 11 digit."] });
+      return;
+    }
+
     if (!gender) {
       setFieldErrors({ gender: ["Jenis kelamin wajib dipilih."] });
       return;
@@ -196,13 +201,22 @@ export function StudentForm({ mode, studentId }: StudentFormProps) {
             />
           </Field>
 
-          <Field error={fieldErrors.npm?.[0]} label="NPM (Nomor Pokok Mahasiswa)" required>
+          <Field
+            error={fieldErrors.npm?.[0]}
+            label={`NPM (11 Digit Angka · ${npm.length}/11)`}
+            required
+          >
             <input
               className="input mono"
+              inputMode="numeric"
+              maxLength={11}
+              minLength={11}
               name="npm"
-              onChange={(e) => setNpm(e.target.value)}
-              placeholder="Contoh: 2410110099"
+              onChange={(e) => setNpm(e.target.value.replace(/\D/g, "").slice(0, 11))}
+              pattern="\d{11}"
+              placeholder="Contoh: 24101100099 (11 angka)"
               required
+              title="NPM harus terdiri dari 11 digit angka"
               type="text"
               value={npm}
             />
