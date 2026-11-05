@@ -8,9 +8,11 @@ import { Icon } from "@/components/ui/icon";
 import { fetchCurrentAdmin, getStoredUser, logoutAdmin } from "@/lib/api";
 import type { AuthUser } from "@/types/dashboard";
 
+export type PublicNavKey = "ikhtisar" | "demografi" | "wilayah" | "fakultas";
 type NavKey = "dashboard" | "demografi" | "fakultas" | "students" | "create";
 
 type PublicShellProps = {
+  current?: PublicNavKey;
   title: string;
   subtitle?: string;
   headerAction?: ReactNode;
@@ -34,19 +36,32 @@ type AppShellProps = {
 };
 
 /**
- * Layout Khusus Pengunjung / Guest (Top Navbar tanpa Sidebar Admin)
+ * Layout Khusus Pengunjung / Guest (Top Navbar Multi-Halaman tanpa Sidebar Admin)
  */
 export function PublicShell({
+  current,
   title,
   subtitle,
   headerAction,
-  searchValue = "",
+  searchValue,
   onSearchChange,
   searchPlaceholder = "Cari fakultas atau program studi...",
   children,
 }: PublicShellProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const [adminUser, setAdminUser] = useState<AuthUser | null>(null);
+  const [internalSearch, setInternalSearch] = useState(searchValue ?? "");
+
+  const activeNav: PublicNavKey =
+    current ??
+    (pathname.startsWith("/demografi")
+      ? "demografi"
+      : pathname.startsWith("/wilayah")
+        ? "wilayah"
+        : pathname.startsWith("/fakultas")
+          ? "fakultas"
+          : "ikhtisar");
 
   useEffect(() => {
     let active = true;
@@ -68,10 +83,16 @@ export function PublicShell({
     };
   }, [pathname]);
 
+  const controlledQuery = onSearchChange ? (searchValue ?? "") : internalSearch;
+
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const target = document.getElementById("katalog-fakultas");
-    target?.scrollIntoView({ behavior: "smooth" });
+    const query = controlledQuery.trim();
+    if (onSearchChange) {
+      onSearchChange(query);
+      return;
+    }
+    router.push(query ? `/fakultas?q=${encodeURIComponent(query)}` : "/fakultas");
   };
 
   return (
@@ -89,18 +110,30 @@ export function PublicShell({
           </Link>
 
           <nav aria-label="Navigasi Statistik Publik" className="public-navbar__links">
-            <a className="public-navbar__link is-active" href="#ikhtisar-utama">
+            <Link
+              className={`public-navbar__link${activeNav === "ikhtisar" ? " is-active" : ""}`}
+              href="/"
+            >
               Ikhtisar
-            </a>
-            <a className="public-navbar__link" href="#analitik-demografi">
+            </Link>
+            <Link
+              className={`public-navbar__link${activeNav === "demografi" ? " is-active" : ""}`}
+              href="/demografi"
+            >
               Demografi &amp; Usia
-            </a>
-            <a className="public-navbar__link" href="#sebaran-wilayah">
+            </Link>
+            <Link
+              className={`public-navbar__link${activeNav === "wilayah" ? " is-active" : ""}`}
+              href="/wilayah"
+            >
               Sebaran Wilayah
-            </a>
-            <a className="public-navbar__link" href="#katalog-fakultas">
+            </Link>
+            <Link
+              className={`public-navbar__link${activeNav === "fakultas" ? " is-active" : ""}`}
+              href="/fakultas"
+            >
               Fakultas &amp; Prodi
-            </a>
+            </Link>
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
@@ -113,11 +146,18 @@ export function PublicShell({
               <Icon name="search" />
               <input
                 aria-label={searchPlaceholder}
-                onChange={(e) => onSearchChange?.(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  if (onSearchChange) {
+                    onSearchChange(next);
+                  } else {
+                    setInternalSearch(next);
+                  }
+                }}
                 placeholder={searchPlaceholder}
                 style={{ height: "38px" }}
                 type="search"
-                value={searchValue}
+                value={controlledQuery}
               />
             </form>
 
@@ -136,7 +176,7 @@ export function PublicShell({
         </header>
 
         <main className="public-workspace">
-          <div className="hero-bar" id="ikhtisar-utama">
+          <div className="hero-bar">
             <div className="hero-bar__title">
               <h1>{title}</h1>
               {subtitle ? <p>{subtitle}</p> : null}
