@@ -1,8 +1,12 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
+"use client";
 
-import { SiteHeader } from "@/components/layout/site-header";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type ReactNode, useEffect, useState } from "react";
+
+import { AppShell } from "@/components/layout/site-header";
 import { Icon } from "@/components/ui/icon";
+import { fetchCurrentAdmin, getStoredToken } from "@/lib/api";
 
 type AdminPageShellProps = {
   title: string;
@@ -11,7 +15,9 @@ type AdminPageShellProps = {
   action?: ReactNode;
   backHref?: string;
   backLabel?: string;
-  current?: "dashboard" | "students";
+  current?: "dashboard" | "students" | "create";
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
 };
 
 export function AdminPageShell({
@@ -22,31 +28,69 @@ export function AdminPageShell({
   backHref,
   backLabel = "Kembali",
   current = "students",
+  searchValue,
+  onSearchChange,
 }: AdminPageShellProps) {
+  const router = useRouter();
+  const [authState, setAuthState] = useState<"checking" | "authenticated" | "unauthenticated">(
+    "authenticated",
+  );
+
+  useEffect(() => {
+    let active = true;
+    const token = getStoredToken();
+    if (!token) {
+      Promise.resolve().then(() => {
+        if (active) {
+          setAuthState("unauthenticated");
+          router.replace("/admin/login");
+        }
+      });
+      return;
+    }
+
+    fetchCurrentAdmin().then((user) => {
+      if (!active) {
+        return;
+      }
+      if (!user) {
+        setAuthState("unauthenticated");
+        router.replace("/admin/login");
+      } else {
+        setAuthState("authenticated");
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
+  const defaultAction = action ?? (
+    <Link className="btn btn--primary" href="/admin/students/create">
+      <Icon name="plus" />
+      Tambah Mahasiswa
+    </Link>
+  );
+
   return (
-    <>
-      <SiteHeader admin current={current} />
-      <main>
-        <section className="section">
-          <div className="wrap">
-            {backHref ? (
-              <Link className="breadcrumb" href={backHref}>
-                <Icon name="chevron-left" />
-                {backLabel}
-              </Link>
-            ) : null}
-            <div className={`page-head${backHref ? " mt" : ""}`}>
-              <div className="page-head__text">
-                <span className="eyebrow">Administrasi</span>
-                <h1>{title}</h1>
-                <p>{description}</p>
-              </div>
-              {action}
-            </div>
-            {children}
-          </div>
-        </section>
-      </main>
-    </>
+    <AppShell
+      backHref={backHref}
+      backLabel={backLabel}
+      current={current}
+      headerAction={defaultAction}
+      onSearchChange={onSearchChange}
+      searchValue={searchValue}
+      subtitle={description}
+      title={title}
+    >
+      {authState === "checking" ? (
+        <div className="bento-card" style={{ alignItems: "center", padding: "48px 24px" }}>
+          <p className="muted">Memverifikasi sesi administrator...</p>
+        </div>
+      ) : (
+        children
+      )}
+    </AppShell>
   );
 }

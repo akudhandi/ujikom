@@ -5,8 +5,10 @@ export default function CreateStudentPage() {
   return (
     <AdminPageShell
       backHref="/admin/students"
-      description="Masukkan data identitas, akademik, dan alamat mahasiswa. Validasi akhir dilakukan oleh Laravel API."
-      title="Tambah mahasiswa"
+      backLabel="Kembali ke Daftar Mahasiswa"
+      current="create"
+      description="Masukkan identitas, penempatan fakultas/program studi, dan alamat sesuai KTP. Mahasiswa baru otomatis berstatus aktif."
+      title="Tambah Mahasiswa Baru"
     >
       <StudentForm mode="create" />
     </AdminPageShell>

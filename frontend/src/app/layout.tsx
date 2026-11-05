@@ -1,23 +1,41 @@
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display-loaded",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-text-loaded",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-mono-loaded",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Data Mahasiswa | Universitas Cakrawala Nusantara",
+  title: "UCN Hub | Sistem Manajemen Data Mahasiswa",
   description:
-    "Sistem manajemen data mahasiswa Universitas Cakrawala Nusantara: statistik publik dan area administrasi.",
+    "Sistem Manajemen Data Mahasiswa Universitas Cakrawala Nusantara — Dashboard Statistik & Administrasi.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html data-radius="soft" lang="id">
-      <head>
-        <link href="https://fonts.googleapis.com" rel="preconnect" />
-        <link crossOrigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400..700&family=Hanken+Grotesk:wght@400..600&family=JetBrains+Mono:wght@400..500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html
+      className={`${outfit.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      data-radius="soft"
+      lang="id"
+    >
       <body>{children}</body>
     </html>
   );
