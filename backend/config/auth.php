@@ -114,4 +114,11 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'admin' => [
+        'name' => env('ADMIN_NAME', 'Administrator UCN'),
+        'username' => env('ADMIN_USERNAME', 'admin'),
+        'email' => env('ADMIN_EMAIL', 'admin@ucn.ac.id'),
+        'password' => env('ADMIN_PASSWORD'),
+    ],
+
 ];
